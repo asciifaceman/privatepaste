@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<title>{{ title }}</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<script type=text/javascript src="{{
+    url_for('static', filename='jquery.js') }}"></script>
+<script type=text/javascript src="{{
+    url_for('static', filename='jquery-ui.js') }}"></script>
+<script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+</head>
+<body>
+<div class=page>
+
+    <h1>{{ header }}</h1>
+    <div class=metanav>
+        <a href="{{ url_for('home') }}">Home</a> |
+        <a href="{{ url_for('home') }}">New Paste</a> |
+        <a href="{{ url_for('home') }}">About</a> |
+        {% if not session.logged_in %}
+        <a href="{{ url_for('home') }}">Log In</a>
+        {% else %}
+        <a href="{{ url_for('home') }}">Blah</a> |
+        <a href="{{ url_for('home') }}">Log Out</a>
+        {% endif %}
+        
+    </div>
+    <link rel=stylesheet href="{{ url_for('static', filename='jquery-ui.css') }}" />
+
+    <div id="Main">
+    {% for message in get_flashed_messages() %}
+        <div class=flash>{{ message }}</div>
+    {% endfor %}
+
+        <p> Completely private pastebin that stores pastes using SALT hashes.</p>
+
+    {% block body %}{% endblock %}
+</div>
+<div class=footer>
+        Powered by Python Flask
+</div>
+</body>
+</html>

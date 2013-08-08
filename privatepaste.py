@@ -5,10 +5,27 @@ from flask import Response, jsonify, flash
 from contextlib import closing
 from datetime import datetime
 import sys, os
+import base64, hashlib, hmac, time, struct
 from wtforms import Form, BooleanField, TextField, PasswordField, validators
 from flask.ext.sqlalchemy import SQLAlchemy
+
+appName = "PrivatePaste"
 
 app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 
+
+
+
+@app.route('/', methods=['GET', 'POST'])
+def home():
+
+    return render_template('home.html')
+
+
+
+
+if __name__ == '__main__':
+    app.run(host='69.164.203.152')
+    
