@@ -2,7 +2,8 @@
 ### Imports
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template
 from flask import Response, jsonify, flash
-from flask.ext.login import LoginManager
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask.ext.login import LoginManager # Not sure if keeping
 from flask.ext.login import login_user
 from flask.ext.login import logout_user
 from flask.ext.login import current_user
@@ -15,6 +16,7 @@ import urlparse
 from wtforms import Form, BooleanField, TextField, PasswordField, validators # unsure if keeping
 from flask.ext.sqlalchemy import SQLAlchemy
 from database import db_session
+from models import User
 from gauth import newSecret, getQRLink, auth
 
 appName = "PrivatePaste"
@@ -23,22 +25,28 @@ app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 db = SQLAlchemy(app)
 
-login_manager = LoginManager()
-login_manager.setup_app(app)
+#login_manager = LoginManager()
+#login_manager.setup_app(app)
+#@login_manager.user_loader
+#def load_user(user_id):
+#    return Users(user_id)
 
-@login_manager.user_loader
-def load_user(user_id):
-    return Users(user_id)
-
-class Users:
-    def __init__(self, user_id):
-        self.id = 
+#class Users:
+#    def __init__(self, user_id):
+#        self.id = user_id.lower()
+#        self.db = 
 
 class LoginForm(Form):
-    username = TextField('Username')
-    password = PasswordField('Password')
-    authcode = TextField('AuthCode')
-    
+    username = TextField('Username', [validators.Length(min=4, max=50)])
+    password = PasswordField('Password', [validators.Required()])
+    authcode = TextField('AuthCode', [validators.Required()])
+
+
+@app.before_request
+def check_user_status():
+    g.user = None
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -50,12 +58,29 @@ def auth_qr_code():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        users_db = db_session.execute('SELECT id, name, gauth, password FROM users')
+        for user in users_db:
+            if not request.form['username'] in user[1]:
+                error = "User not found"
+            elif not check_password_hash(user[3], request.form['password']):
+                error = "Password incorrect"
+            elif not auth(user[3], request.form['authcode']):
+                error = "Google Auth incorrect"
 
+        
+        #return redirect(url_for('home'))
+    else:
+        error = form.validate()
+    return render_template('login.html', form=form, error=error)
 
 @app.route('/logout', methods=['GET', 'POST'])
-@login_required
+#@login_required
 def logout():
-    logout_user()
+    session.pop('logged_in', None)
+    flash("You have been logged out")
     return redirect(url_for('home'))
 
 @app.route('/', methods=['GET', 'POST'])

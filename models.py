@@ -12,9 +12,9 @@ class User(Base):
 
     def __init__(self, name=None, email=None, gauth=None, password=None):
         self.name = name
+        self.email = email
         self.gauth = gauth
         self.password = generate_password_hash(password)
-        self.email = email
 
     def chk_passwd(self, password, provpassword=None):
         if not provpassword:
@@ -23,7 +23,7 @@ class User(Base):
             return check_password_hash(provpassword, password)
 
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return '%r' % (str(self.name))
 
 #class Paste(Base):
     #id = 

@@ -20,10 +20,10 @@ def auth(secret, nstr):
     # raise if ntsr contains anything but numbers
     try:
         int(nstr)
+        tm = int(time.time() / 30)
+        secret = base64.b32decode(secret)
     except ValueError:
-        return False
-    tm = int(time.time() / 30)
-    secret = base64.b32decode(secret)
+        return False    
     # try 30 seconds behind and ahead as well
     for ix in [-1, 0, 1]:
         # convert timestamp to raw bytes
