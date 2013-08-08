@@ -1,0 +1,23 @@
+Private Paste System Requirements (as far as known)
+
+
+Developed on: CentOS6
+
+Preferably a virtual environment for flask/modules (virtualenv -p /usr/bin/python27 venv)
+
+OS:
+python 2.7
+
+PIP installs:
+Flask
+Flask-SQLAlchemy
+Flask-WTForms
+gevent (requires libevent-devel on centos)
+socketio
+
+
+
+To use:
+
+. venv/bin/activate
+python privatepaste.py
