@@ -20,8 +20,10 @@ db = SQLAlchemy(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-
-    return render_template('home.html')
+    title = "PrivatePaste v0.1"
+    header = "PrivatePaste v0.1"
+    defaulttext = ""
+    return render_template('home.html', title=title, header=header, defaulttext=defaulttext)
 
 
 
